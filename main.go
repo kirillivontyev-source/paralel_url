@@ -7,6 +7,17 @@ import (
 	"sync"
 )
 
+func read(v *http.Response) []byte {
+	defer v.Body.Close()
+
+	b, err := io.ReadAll(v.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	return b
+}
+
 func worker(wg *sync.WaitGroup, ch <-chan string) {
 
 	defer wg.Done()
@@ -19,15 +30,7 @@ func worker(wg *sync.WaitGroup, ch <-chan string) {
 			continue
 		}
 
-		defer v.Body.Close()
-
-		b, err := io.ReadAll(v.Body)
-		if err != nil {
-			fmt.Println(err.Error())
-			continue
-		}
-
-		fmt.Printf("url: %+v | byte: %+v \n", url, len(b))
+		fmt.Printf("url: %+v | byte: %+v \n", url, len(read(v)))
 
 	}
 
